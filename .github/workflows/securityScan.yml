@@ -6,35 +6,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Récupération du code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Setup Node (obligatoire : Node >= 20)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3. Installer dépendances du projet Vite
       - name: Install dependencies
         run: yarn install
 
-      # 4. Démarrer Vite en background → expose site + API mockée
-      - name: Start app (Vite)
+      # --- Démarrer front + backend (concurrently) ---
+      - name: Start full app (front + backend)
         run: yarn dev &
 
-      # 5. Attendre que Vite soit prêt et accessible sur 3001
-      - name: Wait for server
+      # --- Attendre que le backend soit prêt sur 3001 ---
+      - name: Wait for backend (API)
         run: npx wait-on http://localhost:3001
 
-      # 6. Lancer ZAP Baseline
-      - name: Base scan
+      # Optionnel mais conseillé : attendre aussi le front
+      - name: Wait for frontend
+        run: npx wait-on http://localhost:3000
+
+      # --- Lancer le scan ZAP (sur le backend) ---
+      - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.15.0
         with:
           target: "http://localhost:3001/"
 
-      # 7. Upload du rapport ZAP
       - name: Upload Report
         uses: actions/upload-artifact@v4
         with:
