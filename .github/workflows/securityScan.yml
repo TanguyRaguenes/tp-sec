@@ -34,6 +34,9 @@ jobs:
         uses: zaproxy/action-baseline@v0.15.0
         with:
           target: "http://localhost:3001/"
+          token: ${{ secrets.GITHUB_TOKEN }}  # <-- le token auto fournis par GitHub
+          allow_issue_writing: true            # <-- permet d'écrire des issues
+          issue_title: "ZAP Security Report"   # <-- titre de l’issue générée
           # auto_update_issue: false
           # allow_issue_writing: false
 
