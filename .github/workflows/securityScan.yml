@@ -27,17 +27,17 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      # ----------------------------------------------------
-      # 4. Démarrage du backend en arrière-plan (&)
-      #    GitHub Actions doit lancer un vrai serveur HTTP
-      #    pour que ZAP puisse faire son scan.
-      # ----------------------------------------------------
-      - name: Start backend
-        run: |
-          cd backend       # On entre dans le dossier backend
-          yarn install     # On installe les dépendances backend
-          yarn start &     # On lance le serveur en BACKGROUND
-        working-directory: ./backend
+      # # ----------------------------------------------------
+      # # 4. Démarrage du backend en arrière-plan (&)
+      # #    GitHub Actions doit lancer un vrai serveur HTTP
+      # #    pour que ZAP puisse faire son scan.
+      # # ----------------------------------------------------
+      # - name: Start backend
+      #   run: |
+      #     cd backend       # On entre dans le dossier backend
+      #     yarn install     # On installe les dépendances backend
+      #     yarn start &     # On lance le serveur en BACKGROUND
+      #   working-directory: ./backend
 
       # ----------------------------------------------------
       # 5. Attendre que le backend soit réellement disponible
