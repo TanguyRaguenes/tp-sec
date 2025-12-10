@@ -10,7 +10,7 @@ jobs:
       - name: Base scan
         uses: zaproxy/action-baseline@v0.15.0
         with:
-          target: "https://example.com"
+          target: "http://localhost:3001/"
 
       - name: Upload Report
         uses: actions/upload-artifact@v4
