@@ -1,68 +1,42 @@
 name: Security Scan
-on: push   # Le workflow se déclenche à chaque push
+on: push
 
 jobs:
   security-scan:
     runs-on: ubuntu-latest
 
     steps:
-      # ----------------------------------------------------
-      # 1. Récupération du code du repository
-      # ----------------------------------------------------
+      # 1. Récupération du code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # ----------------------------------------------------
-      # 2. Installation de Node.js (version 18)
-      #    Nécessaire pour installer et lancer l'application
-      # ----------------------------------------------------
+      # 2. Setup Node (obligatoire : Node >= 20)
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # ----------------------------------------------------
-      # 3. Installation des dépendances du projet racine
-      # ----------------------------------------------------
+      # 3. Installer dépendances du projet Vite
       - name: Install dependencies
         run: yarn install
 
-      # # ----------------------------------------------------
-      # # 4. Démarrage du backend en arrière-plan (&)
-      # #    GitHub Actions doit lancer un vrai serveur HTTP
-      # #    pour que ZAP puisse faire son scan.
-      # # ----------------------------------------------------
-      # - name: Start backend
-      #   run: |
-      #     cd backend       # On entre dans le dossier backend
-      #     yarn install     # On installe les dépendances backend
-      #     yarn start &     # On lance le serveur en BACKGROUND
-      #   working-directory: ./backend
+      # 4. Démarrer Vite en background → expose site + API mockée
+      - name: Start app (Vite)
+        run: yarn dev &
 
-      # ----------------------------------------------------
-      # 5. Attendre que le backend soit réellement disponible
-      #    Sans ça, ZAP essaie trop tôt → "Connection refused"
-      # ----------------------------------------------------
-      - name: Wait for backend
+      # 5. Attendre que Vite soit prêt et accessible sur 3001
+      - name: Wait for server
         run: npx wait-on http://localhost:3001
 
-      # ----------------------------------------------------
-      # 6. Lancement du scan ZAP Baseline
-      #    - Analyse passive (sécurisation)
-      #    - Génère un rapport HTML + JSON
-      # ----------------------------------------------------
+      # 6. Lancer ZAP Baseline
       - name: Base scan
         uses: zaproxy/action-baseline@v0.15.0
         with:
           target: "http://localhost:3001/"
 
-      # ----------------------------------------------------
-      # 7. Upload du rapport ZAP comme artifact
-      #    Tu pourras le télécharger depuis l’onglet "Actions"
-      # ----------------------------------------------------
+      # 7. Upload du rapport ZAP
       - name: Upload Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-report
           path: report_html.html
-
